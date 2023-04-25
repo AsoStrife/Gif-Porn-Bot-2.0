@@ -6,8 +6,6 @@ dotenv.config()
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
-import crypto from 'crypto'
-
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
 bot.start((ctx) => {
@@ -18,49 +16,41 @@ bot.start((ctx) => {
 
 bot.command('pls_porn', async (ctx) => {
     try {
-        ctx.reply('Generating image, Please wait !!!')
         
-        const query = "dick"
-
-        const response = await axios.get(`${process.env.GIF_PROVIDER}?s=${query}`,{
-            headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0'}
-        })
-
-        const videosHtmlContent = response.data.match(/data-gif="(.*?)"/gm)
-
-        console.log(videosHtmlContent)
-    } catch (error) {
-        console.log('error', error)
-        ctx.reply('error sending image')
+    } catch (e) {
     }
 })
 
 bot.on('inline_query', async (ctx) => {
-    
-    console.log(`Searched query: ${ctx.inlineQuery.query}`)
+
+    const offset = parseInt(ctx.inlineQuery.offset)
+
+    const url = Number.isNaN(offset) ?
+        `${process.env.GIF_PROVIDER}?s=${ctx.inlineQuery.query}` :
+        `${process.env.GIF_PROVIDER}/page/${offset}/?s=${ctx.inlineQuery.query}`
+
+    const next_offset = Number.isNaN(offset) ? 2 : offset + 1
+
+    console.log(`Performing request at: ${url}`)
+
+    const response = await axios.get(url)
+
+    const gifs = response.data.match(/data-gif="(.*?)"/gm)
+
+    const responseQuery = gifs.map(g => ({
+        type: 'gif',
+        gif_url: g.replace(/data-gif="(.*?)"/gm, '$1'),
+        id: uuidv4(),
+        url: g.replace(/data-gif="(.*?)"/gm, '$1'),
+        thumb_url: g.replace(/data-gif="(.*?)"/gm, '$1'),
+        thumb_mime_type: 'image/gif'
+    }))
 
     try {
-    
-        const response = await axios.get(`${process.env.GIF_PROVIDER}?s=${ctx.inlineQuery.query}`,{
-            headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0'}
-        })
-
-        const gifs = response.data.match(/data-gif="(.*?)"/gm)
-
-        const responseQuery = gifs.map(g => ({
-            type: 'gif',
-            gif_url: g.replace(/data-gif="(.*?)"/gm,'$1'),
-            id: uuidv4(),
-            url: g.replace(/data-gif="(.*?)"/gm,'$1'),
-            thumb_url: g.replace(/data-gif="(.*?)"/gm,'$1'),
-            thumb_mime_type: 'image/gif',
-        }))
-
-        await ctx.telegram.answerInlineQuery(ctx.inlineQuery.id, responseQuery)
-        
-
-    }catch(err){
-        console.error(err)
+        await ctx.telegram.answerInlineQuery(ctx.inlineQuery.id, responseQuery, { next_offset: next_offset })
+    } catch (e) {
+        if (e?.response)
+            console.log(e.response.status)
     }
 })
 
