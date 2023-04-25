@@ -63,9 +63,16 @@ bot.on('inline_query', async (ctx) => {
 const echoCommand = async (ctx) => {
     const category = ctx.message.text.replace("/", "")
 
-    console.log(category)
+    const page = parseInt(Math.random() * 100)
+
+    const url = `https://porngipfy.com/category/${category}/page/${page}`
+
+    const username = ctx.from.username ? `(@${ctx.from.username}) ` : ''
+
+    console.log(`${getNow()} [${ctx.from.id}] ${ctx.from.first_name} ${ctx.from.last_name} ${username}is searching at: ${url}`)
+
     try {
-        const response = await axios.get(`https://porngipfy.com/category/${category}/`)
+        const response = await axios.get(url)
 
         const gifs = response.data.match(/data-gif="(.*?)"/gm)
 
@@ -73,7 +80,7 @@ const echoCommand = async (ctx) => {
         var gif = gifs[i]
         gif = gif.replace(/data-gif="(.*?)"/gm, '$1')
 
-        console.log(gif)
+
         ctx.replyWithAnimation(gif)
     }
     catch(e){
