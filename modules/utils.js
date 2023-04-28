@@ -1,4 +1,4 @@
-export default function getNow() {
+export function getNow() {
     let date = new Date();
 
     let day = ("0" + date.getDate()).slice(-2);
@@ -19,5 +19,5 @@ export default function getNow() {
     let seconds = date.getSeconds();
 
     // prints date & time in YYYY-MM-DD HH:MM:SS format
-    return `[${year}-${month}-${day} ${hours}:${minutes}:${seconds}]`;
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }

@@ -6,11 +6,11 @@
   "scripts": {
     "start": "node index.js"
   },
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AsoStrife/Gif-Porn-Bot-2.0.git"
   },
+  "type": "module",
   "author": "Andrea Corriga",
   "license": "ISC",
   "bugs": {
@@ -22,5 +22,8 @@
     "dotenv": "^16.0.3",
     "telegraf": "^4.12.2",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
   }
 }
