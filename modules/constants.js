@@ -1,7 +1,14 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 let constants = {
-    // https://porngipfy.com/category/${category}/
+    urls: {
+        base: `${process.env.GIF_PROVIDER}page/:page/`,
+        search: `${process.env.GIF_PROVIDER}page/:page/?s=:s`,
+        categories: `${process.env.GIF_PROVIDER}category/:category/page/:page`,
+        tags: `${process.env.GIF_PROVIDER}tag/:tag/page/:page`
+    },
     categories: ['anal', 'blowjob', 'boobs', 'cumshot', 'interracial', 'lesbian'],
-    // https://porngipfy.com/tag/${tag}/
     tags: [
         [
             { text: 'Agfe', callback_data: 'agfe' },

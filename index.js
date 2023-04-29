@@ -5,65 +5,92 @@ dotenv.config()
 
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
+import fs from 'fs-extra'
 
-import { getNow } from './modules/utils.js'
+import * as utils from './modules/utils.js'
 import Log from './modules/log.js'
-import constants from './constants.js'
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 const log = new Log() 
-const callbackData = constants.tags.flatMap(row => row).map(t => t.callback_data)
 
-
+// Handle /start command
 bot.start((ctx) => {
-    // let message = ``
-    // ctx.reply(message)
+    log.info(`has started the bot`, ctx)
+
+    fs.readFile('./md/start.md', 'utf8')
+    .then((file) => ctx.replyWithMarkdown(file))
+    .catch(err => log.error(`Error reading ./md/start.md`))
 })
 
-bot.action(callbackData, async(ctx) => {
+// Handle /info command
+bot.command('info', (ctx) => {
+    log.info(`has typed \`/info\``, ctx)
+
+    fs.readFile('./md/info.md', 'utf8')
+    .then((file) => ctx.replyWithMarkdown(file))
+    .catch(err => log.error(`Error reading ./md/info.md`))
+})
+
+// Tags handler
+bot.action(utils.getCallbackDataArray(), async(ctx) => {
     const tag = ctx.callbackQuery.data
 
-    const page = parseInt(Math.random() * 100)
+    const page = parseInt(Math.random() * process.env.TAGS_RANDOM_TOP)
 
-    const url = `https://porngipfy.com/tag/${tag}/page/${page}`
+    const url = utils.getTagUrl(tag, page)
+
+    log.info(`has clicked the tag '${tag}' and is searching at: ${url}`, ctx)
 
     try {
         const response = await axios.get(url)
 
-        const gifs = response.data.match(/data-gif="(.*?)"/gm)
+        const gif = utils.getGif(response.data)
 
-        var i = Math.floor(Math.random() * gifs.length)
-        var gif = gifs[i]
-        gif = gif.replace(/data-gif="(.*?)"/gm, '$1')
-
+        log.info(`is receiving the following gif: ${gif}`, ctx)
 
         ctx.replyWithAnimation(gif)
         ctx.answerCbQuery(``)
     }
     catch (e) {
         if (e?.response){
-            log.error(`The following request at ${url} returned the following status: ${e.response.status}`)
-            ctx.answerCbQuery(`Non sono riuscito a recuperare la gif. Riprova.`);
+            log.error(`The following request at ${url} returned the following status: ${e.response.status}`)   
         }
-    }
-});
 
-bot.command('pls_porn', async (ctx) => {
-    try {
-
-    } catch (e) {
+        ctx.answerCbQuery(`The gif could not be retrieved. Please try again.`)
     }
 })
 
+// Random Gif with `pls porn`
+bot.hears('pls porn', async (ctx) => {
+    try {
+        const page = parseInt(Math.random() * process.env.BASE_RANDOM_TOP)
+
+        const url = utils.getBaseUrl( page)
+
+        log.info(`has typed 'pls porn' and is searching at: ${url}`, ctx)
+
+        const response = await axios.get(url)
+
+        const gif = utils.getGif(response.data)
+
+        log.info(`is receiving the following gif: ${gif}`, ctx)
+
+        ctx.replyWithAnimation(gif)
+    }
+    catch (e) {
+        if (e?.response){
+            log.error(`The following request at ${url} returned the following status: ${e.response.status}`)
+        }
+    }
+})
+
+// Handle inline query search
 bot.on('inline_query', async (ctx) => {
 
-    const offset = parseInt(ctx.inlineQuery.offset)
+    const offset = Number.isNaN(parseInt(ctx.inlineQuery.offset)) ? 1 : parseInt(ctx.inlineQuery.offset)
+    const nextOffset = offset + 1
 
-    const url = Number.isNaN(offset) ?
-        `${process.env.GIF_PROVIDER}/page/1/?s=${ctx.inlineQuery.query}` :
-        `${process.env.GIF_PROVIDER}/page/${offset}/?s=${ctx.inlineQuery.query}`
-
-    const next_offset = Number.isNaN(offset) ? 2 : offset + 1
+    const url = utils.getBaseSearcUrl(ctx.inlineQuery.query, offset)
 
     log.info(`is searching at: ${url}`, ctx)
 
@@ -81,64 +108,65 @@ bot.on('inline_query', async (ctx) => {
             thumb_mime_type: 'image/gif'
         }))
 
+        await ctx.telegram.answerInlineQuery(ctx.inlineQuery.id, responseQuery, { next_offset: nextOffset })
 
-        await ctx.telegram.answerInlineQuery(ctx.inlineQuery.id, responseQuery, { next_offset: next_offset })
     } catch (e) {
-        if (e?.response)
+        if (e?.response){
             log.error(`The following request at ${url} returned the following status: ${e.response.status}`)
+        }
     }
 })
 
+// Show the tag keyboard
+const showTags = async (ctx) => {
+    log.info(`has requested the tag keyboard`, ctx)
 
-const echoCommand = async (ctx) => {
-    const category = ctx.message.text.replace("/", "")
+    let inline_keyboard = utils.getInlineKeyboards()
 
-    const page = parseInt(Math.random() * 100)
-
-    const url = `https://porngipfy.com/category/${category}/page/${page}`
-
-    const username = ctx.from.username ? `(@${ctx.from.username}) ` : ''
-
-    console.log(`${getNow()} [${ctx.from.id}] ${ctx.from.first_name} ${ctx.from.last_name} ${username}is searching at: ${url}`)
-
-    try {
-        const response = await axios.get(url)
-
-        const gifs = response.data.match(/data-gif="(.*?)"/gm)
-
-        var i = Math.floor(Math.random() * gifs.length)
-        var gif = gifs[i]
-        gif = gif.replace(/data-gif="(.*?)"/gm, '$1')
-
-
-        ctx.replyWithAnimation(gif)
-    }
-    catch (e) {
-        if (e?.response)
-            log.error(`The following request at ${url} returned the following status: ${e.response.status}`)
-    }
-}
-
-const showButtons = async (ctx) => {
-    let inline_keyboard = constants.tags
-
-        ctx.reply("Seleziona un tag:", {
+        ctx.reply("Choose a tag:", {
             reply_markup: {
                 inline_keyboard: inline_keyboard
             }
         })
 }
-// Utilizzo del middleware di composizione per gestire i comandi
-const commandsHandler = Telegraf.compose([
-    Telegraf.hears('/anal', echoCommand),
-    Telegraf.hears('/blowjob', echoCommand),
-    Telegraf.hears('/boobs', echoCommand),
-    Telegraf.hears('/cumshot', echoCommand),
-    Telegraf.hears('/interracial', echoCommand),
-    Telegraf.hears('/lesbian', echoCommand),
-    Telegraf.hears('/tags', showButtons)
-])
 
+// Handle the category command
+const handleCategory = async (ctx) => {
+    const category = ctx.message.text.replace("/", "")
+
+    const page = parseInt(Math.random() * process.env.CATEGORIES_RANDOM_TOP)
+
+    const url = utils.getCategoryUrl(category, page)
+
+    log.info(`has clicked the '/${category}' command and is searching at: ${url}`, ctx)
+
+    try {
+        const response = await axios.get(url)
+
+        const gif = utils.getGif(response.data)
+
+        log.info(`is receiving the following gif: ${gif}`, ctx)
+
+        ctx.replyWithAnimation(gif)
+    }
+    catch (e) {
+        if (e?.response){
+            log.error(`The following request at ${url} returned the following status: ${e.response.status}`)
+        }
+    }
+}
+
+// Handle multiple commands for categories and tags
+const commandsHandler = Telegraf.compose([
+    Telegraf.hears('/anal', handleCategory),
+    Telegraf.hears('/blowjob', handleCategory),
+    Telegraf.hears('/boobs', handleCategory),
+    Telegraf.hears('/cumshot', handleCategory),
+    Telegraf.hears('/interracial', handleCategory),
+    Telegraf.hears('/lesbian', handleCategory),
+
+    Telegraf.hears('/tags', showTags)
+])
 
 bot.use(commandsHandler)
 
