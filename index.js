@@ -121,7 +121,7 @@ bot.on('inline_query', async (ctx) => {
 const showTags = async (ctx) => {
     log.info(`has requested the tag keyboard`, ctx)
 
-    let inline_keyboard = utils.getInlineKeyboards()
+    let inline_keyboard = utils.getInlineKeyboards(7)
 
         ctx.reply("Choose a tag:", {
             reply_markup: {
@@ -171,4 +171,5 @@ const commandsHandler = Telegraf.compose([
 bot.use(commandsHandler)
 
 log.info(`Starting the bot`)
+
 bot.launch()

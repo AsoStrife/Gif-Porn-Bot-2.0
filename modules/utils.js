@@ -44,8 +44,15 @@ export function getCallbackDataArray(){
     return constants.tags.flatMap(row => row).map(t => t.callback_data)
 }
 
-export function getInlineKeyboards() {
-    return constants.tags
+export function getInlineKeyboards(rows) {
+    const matrix = [] 
+    
+    for (let i = rows; i > 0; i--) {
+        matrix.push(constants.tags.splice(0, Math.ceil(constants.tags.length / i)));
+
+    }
+    
+    return matrix
 }
 
 export function getGif(data) {
