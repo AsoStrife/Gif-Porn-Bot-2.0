@@ -179,9 +179,9 @@ else {
     bot.launch({
         webhook: {
             // Public domain for webhook; e.g.: example.com
-            domain: webhookDomain,
+            domain: process.env.WEBHOOK_DOMAIN,
             // Port to listen on; e.g.: 8080
-            port: port,
+            port: process.env.PORT,
         }
     })
 }
