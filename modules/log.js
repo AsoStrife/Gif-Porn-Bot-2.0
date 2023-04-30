@@ -1,24 +1,41 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 import { getNow } from './utils.js'
+import fs from 'fs-extra'
 
 export default class Log {
 
     constructor() {
+        fs.ensureFile(process.env.LOG_PATH, (err) => {
+            if (err) {
+                console.log(`Error creating log file: ${err}`);
+            }
+        })
     }
 
     log(str, ctx = undefined) {
-        console.log(`${this.prefix(ctx)}${str}`) 
+        const log = `${this.prefix(ctx)}${str}`
+        console.log(log) 
+        this.fileAppend(log)
     }
 
     info(str, ctx = undefined) {
-        console.info(`${this.prefix(ctx)}${str}`) 
+        const log = `${this.prefix(ctx)}${str}`
+        console.info(log)
+        this.fileAppend(log)
     }
 
     error(str, ctx = undefined) {
-        console.error(`${this.prefix(ctx)}${str}`) 
+        const log = `${this.prefix(ctx)}${str}`
+        console.error(log)
+        this.fileAppend(str) 
     }
 
     debug(str, ctx = undefined) {
-        console.debug(`${this.prefix(ctx)}${str}`) 
+        const log = `${this.prefix(ctx)}${str}`
+        console.debug(log) 
+        this.fileAppend(str)
     }
 
     prefix(ctx = undefined) {
@@ -37,4 +54,12 @@ export default class Log {
         return `${id}${name}${last_name}${username}`
     }
 
+    fileAppend(str = ``) {
+        const log = str + `\n`
+        fs.appendFile(process.env.LOG_PATH, log, (err) => {
+            if (err) {
+                console.error(`Failed to write ${str} inside the log file. Error: ${err}`);
+            }
+        })
+    }
 }
