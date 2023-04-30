@@ -170,18 +170,5 @@ const commandsHandler = Telegraf.compose([
 
 bot.use(commandsHandler)
 
-if(process.env.DEBUG == 'true') {
-    log.info(`Starting the bot in development mode`)
-    bot.launch()
-}
-else {
-    log.info(`Starting the bot in production mode at ${process.env.WEBHOOK_DOMAIN} | Port: ${process.env.PORT}`)
-    bot.launch({
-        webhook: {
-            // Public domain for webhook; e.g.: example.com
-            domain: process.env.WEBHOOK_DOMAIN,
-            // Port to listen on; e.g.: 8080
-            port: process.env.PORT,
-        }
-    })
-}
+log.info(`Starting the bot`)
+bot.launch()
