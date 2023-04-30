@@ -22,16 +22,17 @@ let constants = {
         ],
         [
             { text: 'Boobs', callback_data: 'boobs' },
-            { text: 'Brune', callback_data: 'brune' },
             { text: 'Butthole', callback_data: 'butthole' },
+            { text: 'Couple Sex', callback_data: 'couple-sex' },
         ],
         [
-            { text: 'Couple Sex', callback_data: 'couple-sex' },
+            
             { text: 'Creampie', callback_data: 'creampie' },
             { text: 'Cum', callback_data: 'cum' },
+            { text: 'Cumshot', callback_data: 'cumshot' },
         ],
         [
-            { text: 'Cumshot', callback_data: 'cumshot' },
+            { text: 'Deepthroat', callback_data: 'deepthroat' },
             { text: 'Erotic', callback_data: 'erotic' },
             { text: 'Fucking', callback_data: 'fucking' },
         ],
