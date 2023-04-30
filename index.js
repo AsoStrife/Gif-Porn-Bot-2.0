@@ -175,7 +175,7 @@ if(process.env.DEBUG == 'true') {
     bot.launch()
 }
 else {
-    log.info(`Starting the bot in production mode at ${process.env.WEBHOOK_DOMAIN}:${process.env.PORT}`)
+    log.info(`Starting the bot in production mode at ${process.env.WEBHOOK_DOMAIN} | Port: ${process.env.PORT}`)
     bot.launch({
         webhook: {
             // Public domain for webhook; e.g.: example.com
