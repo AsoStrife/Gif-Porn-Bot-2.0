@@ -10,27 +10,36 @@ let constants = {
     },
     categories: ['anal', 'blowjob', 'boobs', 'cumshot', 'interracial', 'lesbian'],
     tags: [
+        [
             { text: 'Agfe', callback_data: 'agfe' },
             { text: 'Anal Fuck', callback_data: 'anal-fuck' },
-            { text: 'Asian', callback_data: 'asian' },
+            { text: 'Asian', callback_data: 'asian' }
+        ],
+        [
             { text: 'Bbc', callback_data: 'bbc' },
             { text: 'Big Dick', callback_data: 'big-dick' },
-            { text: 'Big Tits', callback_data: 'big-tits' },
+            { text: 'Big Tits', callback_data: 'big-tits' }
+        ],
+        [
             { text: 'Boobs', callback_data: 'boobs' },
             { text: 'Butthole', callback_data: 'butthole' },
-            { text: 'Couple Sex', callback_data: 'couple-sex' },
+            { text: 'Couple Sex', callback_data: 'couple-sex' }
+        ],
+        [
             { text: 'Creampie', callback_data: 'creampie' },
             { text: 'Cum', callback_data: 'cum' },
-            { text: 'Cumshot', callback_data: 'cumshot' },
+            { text: 'Cumshot', callback_data: 'cumshot' }
+        ],
+        [
             { text: 'Deepthroat', callback_data: 'deepthroat' },
             { text: 'Erotic', callback_data: 'erotic' },
-            { text: 'Fucking', callback_data: 'fucking' },
-            { text: 'Interacial', callback_data: 'inter-racial' },
-            { text: 'Lesbian', callback_data: 'lesbian' },
-            { text: 'Oral pleasure', callback_data: 'oral-pleasure' },
+            { text: 'Fucking', callback_data: 'fucking' }
+        ],
+        [
             { text: 'Orgy', callback_data: 'orgy' },
             { text: 'Pussy', callback_data: 'pussy' },
             { text: 'Threesome', callback_data: 'threesome' }
+        ]
     ]
 }
 

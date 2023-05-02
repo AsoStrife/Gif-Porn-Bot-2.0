@@ -44,7 +44,11 @@ export function getCallbackDataArray(){
     return constants.tags.flatMap(row => row).map(t => t.callback_data)
 }
 
-export function getInlineKeyboards(rows) {
+export function getInlineKeyboards() {
+    return constants.tags
+}
+
+export function getInlineKeyboardsV2(rows) {
     const matrix = [] 
     
     for (let i = rows; i > 0; i--) {

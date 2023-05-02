@@ -121,13 +121,13 @@ bot.on('inline_query', async (ctx) => {
 const showTags = async (ctx) => {
     log.info(`has requested the tag keyboard`, ctx)
 
-    let inline_keyboard = utils.getInlineKeyboards(7)
+    let inline_keyboard = utils.getInlineKeyboards()
 
-        ctx.reply("Choose a tag:", {
-            reply_markup: {
-                inline_keyboard: inline_keyboard
-            }
-        })
+    ctx.reply("Choose a tag:", {
+        reply_markup: {
+            inline_keyboard: inline_keyboard
+        }
+    })
 }
 
 // Handle the category command
